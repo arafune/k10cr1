@@ -1,12 +1,13 @@
-import serial
 import math
+
+import serial
 from serial.tools import list_ports
 
 
 class K10CR1:
     """Thorlabs K10CR1 rotation stage class."""
 
-    def __init__(self, ser_num):
+    def __init__(self, ser_num: str):
         """Set up and connect to device with serial number: ser_num"""
         self.ser_num = ser_num
         self.ready = False
@@ -24,18 +25,20 @@ class K10CR1:
         ports = list_ports.comports()
         for port in ports:
             print(port)
-            # condition from from Xiayuo's old code, not sure if length check is necessary
-            # VID:PID=0403:faf0
-            # DWB: length check is not necessary...
-            if port[2][26:].startswith(self.ser_num):
-                self.ser = serial.Serial(baudrate=115200, timeout=0.1, port=port[0])
-                self.ready = True
-                break
+            try:
+                if port.hwid.split()[2][4:].startswith(self.ser_num):
+                    self.ser = serial.Serial(
+                        baudrate=115200, timeout=0.1, port=port.device
+                    )
+                    self.ready = True
+                    break
+            except IndexError:
+                pass
 
-    def angle_to_DU(self, ang):
+    def angle_to_DU(self, ang: float):
         return int(ang * 24576000 / 180)
 
-    def DU_to_angle(self, DU):
+    def DU_to_angle(self, DU: int):
         return DU * 180 / 24576000
 
     def dth(self, x, bytelen):
