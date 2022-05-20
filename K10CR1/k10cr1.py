@@ -8,7 +8,7 @@ class K10CR1:
     """Thorlabs K10CR1 rotation stage class.
     """
 
-    def __init__(self, ser_num: str):
+    def __init__(self, ser_num: str) -> None:
         """Set up and connect to device with serial number: ser_num
 
         Parameters
@@ -25,7 +25,7 @@ class K10CR1:
             print("Connect successful to device with serial number: {}".format(ser_num))
             self.zerobacklash()
 
-    def connect(self):
+    def connect(self) -> None:
         """Searches all com ports for device with matching serial number
         and opens a connection
         """
