@@ -155,16 +155,24 @@ class K10CR1:
         return self.ser.write(command)
 
     def identify(self):
-        return self.write("230200005001")
+        """Instruct hardware unit to identify itself by flashing its front panel LEDs)"""
+        return self.write("230200005001") ## 23, 02, 00, 00, 50, 01
 
     def home(self):
-        self.write("430401005001")
+        """Start a fome move
+
+        MGMSG_MOT_MOVE_HOME
+        TX structure:
+
+        43, 04, "Channel ident", 0x, d, s
+        """
+        self.write("430401005001") ## 43, 04, 01, 00, 50, 01
         return self.rd(6)
 
     def moverel(self, x):
         relpos = self.dth(self.angle_to_DU(x), 4)
         chan = "0100"
-        header = "48040600d001"
+        header = "48040600d001" ## 48, 04, 06, 00, d0, 01
         hcmd = header + chan + relpos
         # print(hcmd)
         self.write(hcmd)
@@ -173,7 +181,7 @@ class K10CR1:
     def moveabs(self, x):
         abspos = self.dth(self.angle_to_DU(x), 4)
         chan = "0100"
-        header = "53040600d001"
+        header = "53040600d001" ## 53, 04, 06, 00, d0, 01
         hcmd = header + chan + abspos
         # print(hcmd)
         self.write(hcmd)
@@ -182,18 +190,35 @@ class K10CR1:
     def zerobacklash(self):
         backlashpos = self.dth(self.angle_to_DU(0), 4)
         chan = "0100"
-        header = "3A040600d001"
+        header = "3A040600d001"  ## 3A, 04, 06, 00, d0, 01
         hcmd = header + chan + backlashpos
         self.write(hcmd)
         # return rd(20)
 
     def jog(self):
-        self.write("6a0401015001")
+        self.write("6a0401015001") ## 6a, 04, 01, 01, 50, 01
         return self.rd(20)
 
     def getpos(self):
-        self.write("110401005001")
+        self.write("110401005001") ## 11, 04, 01, 00, 50, 01
         bytedata = self.rd(12)
         bytedata = bytedata[8:]
         x = self.DU_to_angle(self.btd(bytedata))
         return float("%.3f" % x)
+
+
+
+"""
+The source and destination fields require some further explanation.
+In general, as the name suggests, they are used to indicate the
+source and destination of the message. In non-card- slot type of
+systems the source and destination of messages is always unambiguous,
+as each module appears as a separate USB node in the system.
+In these systems, when the host sends a message to the module,
+it uses the source identification byte of 0x01 (meaning host)
+and the destination byte of 0x50 (meaning “generic USB unit”).
+(In messages that the module sends back to the host,
+the content of the source and destination bytes is swapped.)
+"""
+
+"""なので、最後が 01 で終わるのは当然"""
