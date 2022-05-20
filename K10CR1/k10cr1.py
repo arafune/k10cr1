@@ -26,13 +26,13 @@ class K10CR1:
         for port in ports:
             print(port)
             try:
-                if port.hwid.split()[2][4:].startswith(self.ser_num):
+                if port.serial_number.startswith(self.ser_num):
                     self.ser = serial.Serial(
                         baudrate=115200, timeout=0.1, port=port.device
                     )
                     self.ready = True
                     break
-            except IndexError:
+            except AttributeError:
                 pass
 
     def angle_to_DU(self, ang: float):
