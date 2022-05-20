@@ -5,10 +5,17 @@ from serial.tools import list_ports
 
 
 class K10CR1:
-    """Thorlabs K10CR1 rotation stage class."""
+    """Thorlabs K10CR1 rotation stage class.
+    """
 
     def __init__(self, ser_num: str):
-        """Set up and connect to device with serial number: ser_num"""
+        """Set up and connect to device with serial number: ser_num
+
+        Parameters
+        ----------
+        ser_num : str
+            serial number of the K10CR1
+        """
         self.ser_num = ser_num
         self.ready = False
         self.connect()
@@ -41,7 +48,7 @@ class K10CR1:
     def DU_to_angle(self, DU: int):
         return DU * 180 / 24576000
 
-    def dth(self, x, bytelen):
+    def dth(self, x: int, bytelen):
         # print(x, '---', bytelen)
         if x >= 0:
             hstring = hex(x)
