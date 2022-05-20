@@ -169,7 +169,7 @@ class K10CR1:
         self.write("430401005001") ## 43, 04, 01, 00, 50, 01
         return self.rd(6)
 
-    def moverel(self, x):
+    def moverel(self, x) -> None:
         relpos = self.dth(self.angle_to_DU(x), 4)
         chan = "0100"
         header = "48040600d001" ## 48, 04, 06, 00, d0, 01
@@ -178,7 +178,7 @@ class K10CR1:
         self.write(hcmd)
         # return self.rd(20)
 
-    def moveabs(self, x):
+    def moveabs(self, x) -> None:
         abspos = self.dth(self.angle_to_DU(x), 4)
         chan = "0100"
         header = "53040600d001" ## 53, 04, 06, 00, d0, 01
@@ -187,7 +187,7 @@ class K10CR1:
         self.write(hcmd)
         # return rd(20)
 
-    def zerobacklash(self):
+    def zerobacklash(self) -> None:
         backlashpos = self.dth(self.angle_to_DU(0), 4)
         chan = "0100"
         header = "3A040600d001"  ## 3A, 04, 06, 00, d0, 01
@@ -199,7 +199,7 @@ class K10CR1:
         self.write("6a0401015001") ## 6a, 04, 01, 01, 50, 01
         return self.rd(20)
 
-    def getpos(self):
+    def getpos(self) -> float:
         self.write("110401005001") ## 11, 04, 01, 00, 50, 01
         bytedata = self.rd(12)
         bytedata = bytedata[8:]
