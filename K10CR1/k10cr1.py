@@ -42,10 +42,10 @@ class K10CR1:
             except AttributeError:
                 pass
 
-    def angle_to_DU(self, ang: float):
+    def angle_to_DU(self, ang: float) -> int:
         return int(ang * 24576000 / 180)
 
-    def DU_to_angle(self, DU: int):
+    def DU_to_angle(self, DU: int) -> float:
         return DU * 180 / 24576000
 
     def dth(self, x: int, bytelen):
@@ -139,8 +139,20 @@ class K10CR1:
             bstring = "".join(new)
             return (int(bstring, 2)) * (-1)
 
-    def htb(self, x):
-        # print(x)
+    def htb(self, x:str) -> bytearray:
+        """Return the bytearray
+        htb (Hexadecimal TO Bytearrey)
+
+        Parameters
+        ----------
+        x : str
+            hexadecimal number such as "03" "FE"
+
+        Returns
+        -------
+        bytearray
+            Bytearray from a string of hexadecimal number
+        """
         return bytearray.fromhex(x)
 
     def rd(self, bytelen):
@@ -149,17 +161,17 @@ class K10CR1:
             x = x + self.ser.readline()
         return x
 
-    def write(self, x):
+    def write(self, x: str) -> None:
         command = self.htb(x)
         # print(command)
         return self.ser.write(command)
 
-    def identify(self):
+    def identify(self) -> None:
         """Instruct hardware unit to identify itself by flashing its front panel LEDs)"""
         return self.write("230200005001") ## 23, 02, 00, 00, 50, 01
 
-    def home(self):
-        """Start a fome move
+    def home(self) -> None:
+        """Start a home move
 
         MGMSG_MOT_MOVE_HOME
         TX structure:
@@ -169,34 +181,58 @@ class K10CR1:
         self.write("430401005001") ## 43, 04, 01, 00, 50, 01
         return self.rd(6)
 
-    def moverel(self, x) -> None:
-        relpos = self.dth(self.angle_to_DU(x), 4)
-        chan = "0100"
+    def moverel(self, angle_deg:float) -> None:
+        """Start a relative move.
+
+        In this method, the longer version (6 byte header plus 6 data bytes) is used.
+        Thus, the third and 4th bytes is "06 00"
+
+        Parameters
+        -----------
+        anlge_deg: float
+            Relative rotatio angle in degree.
+        """
+        relpos: str = self.dth(self.angle_to_DU(x), 4)
+        channel: str = "0100"
         header = "48040600d001" ## 48, 04, 06, 00, d0, 01
-        hcmd = header + chan + relpos
-        # print(hcmd)
+        hcmd: str = header + channel + relpos
         self.write(hcmd)
         # return self.rd(20)
 
-    def moveabs(self, x) -> None:
-        abspos = self.dth(self.angle_to_DU(x), 4)
-        chan = "0100"
-        header = "53040600d001" ## 53, 04, 06, 00, d0, 01
-        hcmd = header + chan + abspos
+    def moveabs(self, angle_deg:float) -> None:
+        """Start a absolute move.
+
+        Parameters
+        ----------
+        angle_deg : float
+            Absolute angle of the stage head in degree.
+        """
+        abspos: str = self.dth(self.angle_to_DU(angle_deg), 4)
+        channel: str = "0100"
+        header: str = "53040600d001" ## 53, 04, 06, 00, d0, 01
+        hcmd:str = header + channel + abspos
         # print(hcmd)
         self.write(hcmd)
         # return rd(20)
 
     def zerobacklash(self) -> None:
         backlashpos = self.dth(self.angle_to_DU(0), 4)
-        chan = "0100"
-        header = "3A040600d001"  ## 3A, 04, 06, 00, d0, 01
-        hcmd = header + chan + backlashpos
+        channel: str  = "0100"
+        header: str = "3A040600d001"  ## 3A, 04, 06, 00, d0, 01
+        hcmd: str = header + channel + backlashpos
         self.write(hcmd)
         # return rd(20)
 
     def jog(self):
+        """Jog starts
+
+        Returns
+        -------
+        Start a jog move
+        """
         self.write("6a0401015001") ## 6a, 04, 01, 01, 50, 01
+                                   ## the first 01 is the channel.
+                                   ## the second 01 is the forward jog.
         return self.rd(20)
 
     def getpos(self) -> float:
