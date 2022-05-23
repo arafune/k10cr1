@@ -154,7 +154,7 @@ class K10CR1:
         """
         return bytearray.fromhex(x)
 
-    def rd(self, bytelen):
+    def rd(self, bytelen: int) -> bytes:
         x = self.ser.readline()
         while len(x) < bytelen:
             x = x + self.ser.readline()
@@ -205,7 +205,7 @@ class K10CR1:
         self.write("430401005001")  ## 43, 04, 01, 00, 50, 01
         return self.rd(6)
 
-    def moverel(self, angle_deg: float) -> None:
+    def moverel(self, angle_deg: float) -> bytes:
         """Start a relative move.
 
         In this method, the longer version (6 byte header plus 6 data bytes) is used.
@@ -221,9 +221,9 @@ class K10CR1:
         header = "48040600d001"  ## 48, 04, 06, 00, d0, 01
         hcmd: str = header + channel + relpos
         self.write(hcmd)
-        # return self.rd(20)
+        return self.rd(20)
 
-    def moveabs(self, angle_deg: float) -> None:
+    def moveabs(self, angle_deg: float) -> bytes:
         """Start a absolute move.
 
         Parameters
@@ -237,15 +237,15 @@ class K10CR1:
         hcmd: str = header + channel + abspos
         # print(hcmd)
         self.write(hcmd)
-        # return rd(20)
+        return self.rd(20)
 
-    def zerobacklash(self) -> None:
+    def zerobacklash(self) -> bytes:
         backlashpos = self.dth(self.angle_to_DU(0), 4)
         channel: str = "0100"
         header: str = "3A040600d001"  ## 3A, 04, 06, 00, d0, 01
         hcmd: str = header + channel + backlashpos
         self.write(hcmd)
-        # return rd(20)
+        return self.rd(20)
 
     def jog(self):
         """Jog starts
