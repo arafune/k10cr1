@@ -182,7 +182,7 @@ class K10CR1:
         home_direction: str = "0200"
         limit_switch: str = "0100"
         velocity: str = self.dth(int(7329109 * speed_deg_s), 4)
-        offset_distance: str = self.dth(self.angle_to_DU(x), 4)
+        offset_distance: str = self.dth(self.angle_to_DU(0), 4)
         self.write(
             set_home_params
             + channel
