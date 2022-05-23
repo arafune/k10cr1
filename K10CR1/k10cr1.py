@@ -5,8 +5,7 @@ from serial.tools import list_ports
 
 
 class K10CR1:
-    """Thorlabs K10CR1 rotation stage class.
-    """
+    """Thorlabs K10CR1 rotation stage class."""
 
     def __init__(self, ser_num: str) -> None:
         """Set up and connect to device with serial number: ser_num
@@ -139,7 +138,7 @@ class K10CR1:
             bstring = "".join(new)
             return (int(bstring, 2)) * (-1)
 
-    def htb(self, x:str) -> bytearray:
+    def htb(self, x: str) -> bytearray:
         """Return the bytearray
         htb (Hexadecimal TO Bytearrey)
 
@@ -167,9 +166,8 @@ class K10CR1:
         return self.ser.write(command)
 
     def identify(self) -> None:
-        """Instruct hardware unit to identify itself by flashing its front panel LEDs)"""
-        return self.write("230200005001") # 23, 02, 00, 00, 50, 01
-
+        """Identify itself by flashing its front panel LEDs)"""
+        return self.write("230200005001")  # 23, 02, 00, 00, 50, 01
 
     def set_home_speed(self, speed_deg_s: float) -> None:
         """Set the velocity for homing
@@ -179,16 +177,21 @@ class K10CR1:
         speed_deg_s : int
             rotation sppeed in degree/s.
         """
-        set_home_params: str =  '40040E00d001'
+        set_home_params: str = "40040E00d001"
         channel: str = "0100"
         home_direction: str = "0200"
         limit_switch: str = "0100"
-        velocity: str = self.dth(int(7329109*speed_deg_s), 4)
+        velocity: str = self.dth(int(7329109 * speed_deg_s), 4)
         offset_distance: str = self.dth(self.angle_to_DU(x), 4)
-        self.write(set_home_params+channel+home_direction+limit_switch+velocity+offset_distance)
+        self.write(
+            set_home_params
+            + channel
+            + home_direction
+            + limit_switch
+            + velocity
+            + offset_distance
+        )
         return None
-
-
 
     def home(self) -> None:
         """Start a home move
@@ -198,11 +201,11 @@ class K10CR1:
 
         43, 04, "Channel ident", 0x, d, s
         """
-        self.set_home_spped(10)
-        self.write("430401005001") ## 43, 04, 01, 00, 50, 01
+        self.set_home_speed(10)
+        self.write("430401005001")  ## 43, 04, 01, 00, 50, 01
         return self.rd(6)
 
-    def moverel(self, angle_deg:float) -> None:
+    def moverel(self, angle_deg: float) -> None:
         """Start a relative move.
 
         In this method, the longer version (6 byte header plus 6 data bytes) is used.
@@ -215,12 +218,12 @@ class K10CR1:
         """
         relpos: str = self.dth(self.angle_to_DU(x), 4)
         channel: str = "0100"
-        header = "48040600d001" ## 48, 04, 06, 00, d0, 01
+        header = "48040600d001"  ## 48, 04, 06, 00, d0, 01
         hcmd: str = header + channel + relpos
         self.write(hcmd)
         # return self.rd(20)
 
-    def moveabs(self, angle_deg:float) -> None:
+    def moveabs(self, angle_deg: float) -> None:
         """Start a absolute move.
 
         Parameters
@@ -230,15 +233,15 @@ class K10CR1:
         """
         abspos: str = self.dth(self.angle_to_DU(angle_deg), 4)
         channel: str = "0100"
-        header: str = "53040600d001" ## 53, 04, 06, 00, d0, 01
-        hcmd:str = header + channel + abspos
+        header: str = "53040600d001"  ## 53, 04, 06, 00, d0, 01
+        hcmd: str = header + channel + abspos
         # print(hcmd)
         self.write(hcmd)
         # return rd(20)
 
     def zerobacklash(self) -> None:
         backlashpos = self.dth(self.angle_to_DU(0), 4)
-        channel: str  = "0100"
+        channel: str = "0100"
         header: str = "3A040600d001"  ## 3A, 04, 06, 00, d0, 01
         hcmd: str = header + channel + backlashpos
         self.write(hcmd)
@@ -252,17 +255,16 @@ class K10CR1:
         Start a jog move
         """
         self.write("6a0401015001")  # 6a, 04, 01, 01, 50, 01
-                                    # the first 01 is the channel.
-                                    # the second 01 is the forward jog.
+        # the first 01 is the channel.
+        # the second 01 is the forward jog.
         return self.rd(20)
 
     def getpos(self) -> float:
-        self.write("110401005001") ## 11, 04, 01, 00, 50, 01
+        self.write("110401005001")  ## 11, 04, 01, 00, 50, 01
         bytedata = self.rd(12)
         bytedata = bytedata[8:]
         x = self.DU_to_angle(self.btd(bytedata))
         return float("%.3f" % x)
-
 
 
 """
