@@ -216,7 +216,7 @@ class K10CR1:
         anlge_deg: float
             Relative rotatio angle in degree.
         """
-        relpos: str = self.dth(self.angle_to_DU(x), 4)
+        relpos: str = self.dth(self.angle_to_DU(angle_deg), 4)
         channel: str = "0100"
         header = "48040600d001"  ## 48, 04, 06, 00, d0, 01
         hcmd: str = header + channel + relpos
