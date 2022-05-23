@@ -48,7 +48,7 @@ class K10CR1:
     def DU_to_angle(self, DU: int) -> float:
         return DU * 180 / 24576000
 
-    def dth(self, x: int, bytelen):
+    def dth(self, x: int, bytelen: int) -> str:
         # print(x, '---', bytelen)
         if x >= 0:
             hstring = hex(x)
@@ -168,7 +168,27 @@ class K10CR1:
 
     def identify(self) -> None:
         """Instruct hardware unit to identify itself by flashing its front panel LEDs)"""
-        return self.write("230200005001") ## 23, 02, 00, 00, 50, 01
+        return self.write("230200005001") # 23, 02, 00, 00, 50, 01
+
+
+    def set_home_speed(self, speed_deg_s: float) -> None:
+        """Set the velocity for homing
+
+        Parameters
+        ----------
+        speed_deg_s : int
+            rotation sppeed in degree/s.
+        """
+        set_home_params: str =  '40040E00d001'
+        channel: str = "0100"
+        home_direction: str = "0200"
+        limit_switch: str = "0100"
+        velocity: str = self.dth(int(7329109*speed_deg_s), 4)
+        offset_distance: str = self.dth(self.angle_to_DU(x), 4)
+        self.write(set_home_params+channel+home_direction+limit_switch+velocity+offset_distance)
+        return None
+
+
 
     def home(self) -> None:
         """Start a home move
@@ -178,6 +198,7 @@ class K10CR1:
 
         43, 04, "Channel ident", 0x, d, s
         """
+        self.set_home_spped(10)
         self.write("430401005001") ## 43, 04, 01, 00, 50, 01
         return self.rd(6)
 
@@ -230,9 +251,9 @@ class K10CR1:
         -------
         Start a jog move
         """
-        self.write("6a0401015001") ## 6a, 04, 01, 01, 50, 01
-                                   ## the first 01 is the channel.
-                                   ## the second 01 is the forward jog.
+        self.write("6a0401015001")  # 6a, 04, 01, 01, 50, 01
+                                    # the first 01 is the channel.
+                                    # the second 01 is the forward jog.
         return self.rd(20)
 
     def getpos(self) -> float:
