@@ -162,7 +162,6 @@ class K10CR1:
 
     def write(self, x: str) -> None:
         command = self.htb(x)
-        # print(command)
         return self.ser.write(command)
 
     def identify(self) -> None:
@@ -213,8 +212,8 @@ class K10CR1:
 
         Parameters
         -----------
-        anlge_deg: float
-            Relative rotatio angle in degree.
+        angle_deg: float
+            Relative rotation angle in degree.
         """
         relpos: str = self.dth(self.angle_to_DU(angle_deg), 4)
         channel: str = "0100"
@@ -247,7 +246,7 @@ class K10CR1:
         self.write(hcmd)
         # return self.rd(20)
 
-    def jog(self):
+    def jog(self) -> bytes:
         """Jog starts
 
         Returns
