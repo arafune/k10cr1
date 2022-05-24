@@ -174,7 +174,7 @@ class K10CR1:
         Parameters
         ----------
         speed_deg_s : int
-            rotation sppeed in degree/s.
+            rotation speed in degree/s.
         """
         set_home_params: str = "40040E00d001"
         channel: str = "0100"
