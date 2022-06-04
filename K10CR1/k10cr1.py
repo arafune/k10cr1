@@ -48,7 +48,6 @@ class K10CR1:
         return DU * 180 / 24576000
 
     def dth(self, x: int, bytelen: int) -> str:
-        # print(x, '---', bytelen)
         if x >= 0:
             hstring = hex(x)
             hstring = hstring[2:]
@@ -109,10 +108,9 @@ class K10CR1:
             lenhstring = len(hstring)
             if lenhstring > 2 * bytelen:
                 hstring = hstring[1:]
-            # print(hstring)
             return hstring
 
-    def btd(self, x):
+    def btd(self, x: bytes) -> int:
         bytelen = len(x)
         count = 0
         dvalue = 0
@@ -214,14 +212,13 @@ class K10CR1:
         Parameters
         -----------
         anlge_deg: float
-            Relative rotatio angle in degree.
+            Relative rotation angle in degree.
         """
-        relpos: str = self.dth(self.angle_to_DU(angle_deg), 4)
+        rel_position: str = self.dth(self.angle_to_DU(angle_deg), 4)
         channel: str = "0100"
         header = "48040600d001"  ## 48, 04, 06, 00, d0, 01
-        hcmd: str = header + channel + relpos
-        self.write(hcmd)
-        # return self.rd(20)
+        cmd: str = header + channel + rel_position
+        self.write(cmd)
 
     def moveabs(self, angle_deg: float) -> None:
         """Start a absolute move.
@@ -231,23 +228,21 @@ class K10CR1:
         angle_deg : float
             Absolute angle of the stage head in degree.
         """
-        abspos: str = self.dth(self.angle_to_DU(angle_deg), 4)
+        abs_position: str = self.dth(self.angle_to_DU(angle_deg), 4)
         channel: str = "0100"
-        header: str = "53040600d001"  ## 53, 04, 06, 00, d0, 01
-        hcmd: str = header + channel + abspos
-        # print(hcmd)
-        self.write(hcmd)
+        header: str = "53040600d001"  # 53, 04, 06, 00, d0, 01
+        cmd: str = header + channel + abs_position
+        self.write(cmd)
         # return self.rd(20)
 
     def zerobacklash(self) -> None:
-        backlashpos = self.dth(self.angle_to_DU(0), 4)
+        backlash_position = self.dth(self.angle_to_DU(0), 4)
         channel: str = "0100"
-        header: str = "3A040600d001"  ## 3A, 04, 06, 00, d0, 01
-        hcmd: str = header + channel + backlashpos
-        self.write(hcmd)
-        # return self.rd(20)
+        header: str = "3A040600d001"  # 3A, 04, 06, 00, d0, 01
+        cmd: str = header + channel + backlash_position
+        self.write(cmd)
 
-    def jog(self):
+    def jog(self) -> bytes:
         """Jog starts
 
         Returns
@@ -261,8 +256,7 @@ class K10CR1:
 
     def getpos(self) -> float:
         self.write("110401005001")  ## 11, 04, 01, 00, 50, 01
-        bytedata = self.rd(12)
-        bytedata = bytedata[8:]
+        bytedata: bytes = self.rd(12)[8:]
         x = self.DU_to_angle(self.btd(bytedata))
         return float("%.3f" % x)
 
