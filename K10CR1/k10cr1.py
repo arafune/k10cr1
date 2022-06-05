@@ -136,22 +136,6 @@ class K10CR1:
             bstring = "".join(new)
             return (int(bstring, 2)) * (-1)
 
-    def htb(self, x: str) -> bytearray:
-        """Return the bytearray
-        htb (Hexadecimal TO Bytearrey)
-
-        Parameters
-        ----------
-        x : str
-            hexadecimal number such as "03" "FE"
-
-        Returns
-        -------
-        bytearray
-            Bytearray from a string of hexadecimal number
-        """
-        return bytearray.fromhex(x)
-
     def rd(self, bytelen: int) -> bytes:
         x = self.ser.readline()
         while len(x) < bytelen:
@@ -159,8 +143,7 @@ class K10CR1:
         return x
 
     def write(self, x: str) -> None:
-        command = self.htb(x)
-        # print(command)
+        command = bytearray.fromhex(x)
         return self.ser.write(command)
 
     def identify(self) -> None:
