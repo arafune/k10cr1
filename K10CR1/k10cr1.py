@@ -156,7 +156,7 @@ class K10CR1:
         Parameters
         ----------
         speed_deg_s : int
-            rotation sppeed in degree/s.
+            rotation speed in degree/s.
         """
         set_home_params: str = "40040E00d001"
         channel: str = "0100"
@@ -189,13 +189,17 @@ class K10CR1:
     def moverel(self, angle_deg: float) -> None:
         """Start a relative move.
 
-        In this method, the longer version (6 byte header plus 6 data bytes) is used.
-        Thus, the third and 4th bytes is "06 00"
+                In this method, the longer version (6 byte header plus 6 data bytes) is used.
+                Thus, the third and 4th bytes is "06 00"
 
-        Parameters
-        -----------
-        anlge_deg: float
-            Relative rotation angle in degree.
+                Parameters
+                -----------
+        <<<<<<< HEAD
+                anlge_deg: float
+        =======
+                angle_deg: float
+        >>>>>>> a794259d6399ff5a82366c24759e5bf0810320ce
+                    Relative rotation angle in degree.
         """
         rel_position: str = self.dth(self.angle_to_DU(angle_deg), 4)
         channel: str = "0100"
