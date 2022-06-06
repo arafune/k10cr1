@@ -156,23 +156,41 @@ class K10CR1:
         return float("%.3f" % x)
 
 
-def digit_to_hex(x: int, bytelen: int) -> str:
-    """Generate hex string from integer (same function with dth)
+def decimal_to_hex(x: int, byte_length: int) -> str:
+    """Genearate hex string from integer
+
+    After python3.2 to_byte method has been prepared.
 
     Parameters
     ----------
     x : int
-        input integer value
-    bytelen : int
-        byte length of the output string.
+        _description_
+    byte_length : int
+        _description_
 
     Returns
     -------
     str
-        string of hexadecimal value with big-endian
+        _description_
     """
-    tmp = _tohex(x, bytelen)[2:].zfill(bytelen * 2)
-    return str(binascii.hexlify(bytes.fromhex(tmp)[::-1]))[2:-1]
+    tmp = x.to_bytes(byte_length, byteorder="little", signed=True)
+    return str(binascii.b2a_hex(tmp), encoding="utf-8")
+
+
+def bytes_to_decimal(x: bytes) -> int:
+    """Return the int from the bytes.   Essentially btd return the same value
+
+    Parameters
+    ----------
+    x : bytes
+        Represents an integer
+
+    Returns
+    -------
+    int
+        integer
+    """
+    return int.from_bytes(x, byteorder="little", signed=True)
 
 
 def dth(x: int, bytelen: int) -> str:
@@ -252,22 +270,6 @@ def dth(x: int, bytelen: int) -> str:
         return hstring
 
 
-def bytes_to_digit(x: bytes) -> int:
-    """Return the int from the bytes.   Essentially btd return the same value
-
-    Parameters
-    ----------
-    x : bytes
-        Represents an integer
-
-    Returns
-    -------
-    int
-        integer
-    """
-    return int.from_bytes(x, byteorder="little", signed=True)
-
-
 def btd(x: bytes) -> int:
     bytelen = len(x)
     count = 0
@@ -293,10 +295,6 @@ def btd(x: bytes) -> int:
             count = count + 1
         bstring = "".join(new)
         return (int(bstring, 2)) * (-1)
-
-
-def _tohex(val: int, bytelength: int) -> str:
-    return hex((val + (1 << bytelength * 8)) % (1 << bytelength * 8))
 
 
 """

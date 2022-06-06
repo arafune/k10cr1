@@ -11,19 +11,19 @@ from K10CR1.k10cr1 import digit_to_hex
 
 class Test_equality_dth_digit_to_hex:
     def test_bit1(self) -> None:
-        for i in range(-(2 ** (8 * 1)) + 1, 2 ** (8 * 1)):
+        for i in range(-(2 ** (8 * 1)) / 2, 2 ** (8 * 1) / 2 - 1):
             print(i)
-            assert dth(i, 1) == digit_to_hex(i, 1)
+            assert dth(i, 1) == decimal_to_hex(i, 1)
 
     def test_bit2(self) -> None:
         for _ in range(1000):
-            x: int = randint(-(2 ** (8 * 2)) + 1, 2 ** (8 * 2))
-            assert dth(x, 2) == digit_to_hex(x, 2)
+            x: int = randint(-(2 ** (8 * 2)) / 2, 2 ** (8 * 2) / 2 - 1)
+            assert dth(x, 2) == decimal_to_hex(x, 2)
 
     def test_bit4(self) -> None:
         for _ in range(100000):
-            x: int = randint(-(2 ** (8 * 4)) + 1, 2 ** (8 * 4))
-            assert dth(x, 4) == digit_to_hex(x, 4)
+            x: int = randint(-(2 ** (8 * 4)) / 2, 2 ** (8 * 4) / 2 - 1)
+            assert dth(x, 4) == decimal_to_hex(x, 4)
 
 
 class Test_dth:
