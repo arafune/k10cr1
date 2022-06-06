@@ -47,95 +47,6 @@ class K10CR1:
     def DU_to_angle(self, DU: int) -> float:
         return DU * 180 / 24576000
 
-    def dth(self, x: int, bytelen: int) -> str:
-        if x >= 0:
-            hstring = hex(x)
-            hstring = hstring[2:]
-            while len(hstring) < 2 * bytelen:
-                hstring = "0" + hstring
-            count = 0
-            new = list(hstring)
-            while count < bytelen * 2:
-                tmp = new[count]
-                new[count] = new[count + 1]
-                new[count + 1] = tmp
-                count = count + 2
-            hstring = "".join(new)
-            hstring = hstring[::-1]
-            return hstring
-        elif x < 0:
-            y = abs(x)
-            bstring = bin(y)
-            bstring = bstring[2:]
-            while len(bstring) < 2 * bytelen * 4:
-                bstring = "0" + bstring
-            # print(bstring)
-            count = 0
-            new = list(bstring)
-            while count < 2 * bytelen * 4:
-                if new[count] == "1":
-                    new[count] = "0"
-                else:
-                    new[count] = "1"
-                count = count + 1
-
-            bstring = "".join(new)
-            # print(bstring)
-            count = 2 * bytelen * 4 - 1
-            add = "1"
-            while count > -1:
-                if new[count] != add:
-                    add = "0"
-                    new[count] = "1"
-                else:
-                    new[count] = "0"
-                count = count - 1
-            bstring = "".join(new)
-            # print(bstring)
-            hstring = hex(int(bstring, 2))
-            hstring = hstring[2:]
-            while len(hstring) < 2 * bytelen:
-                hstring = "0" + hstring
-            count = 0
-            new = list(hstring)
-            while count < bytelen * 2:
-                tmp = new[count]
-                new[count] = new[count + 1]
-                new[count + 1] = tmp
-                count = count + 2
-            hstring = "".join(new)
-            hstring = hstring[::-1]
-            lenhstring = len(hstring)
-            if lenhstring > 2 * bytelen:
-                hstring = hstring[1:]
-            return hstring
-
-    def btd(self, x: bytes) -> int:
-        bytelen = len(x)
-        count = 0
-        dvalue = 0
-        while count < bytelen:
-            dvalue = dvalue + x[count] * (math.pow(256, count))
-            count = count + 1
-        bstring = bin(int(dvalue))
-        if len(bstring) < 2 * bytelen * 4 + 2:
-            return int(dvalue)
-        elif len(bstring) > 2 * bytelen * 4 + 2:
-            print("Error:Error in byte conversion")
-        else:
-            bstring = bin(int(dvalue - 1))
-            bstring = bstring[2:]
-            count = 0
-            new = list(bstring)
-            while count < 2 * bytelen * 4:
-                if new[count] == "1":
-                    new[count] = "0"
-                else:
-                    new[count] = "1"
-                count = count + 1
-            bstring = "".join(new)
-            return (int(bstring, 2)) * (-1)
-
     def rd(self, bytelen: int) -> bytes:
         x = self.ser.readline()
         while len(x) < bytelen:
@@ -162,8 +73,8 @@ class K10CR1:
         channel: str = "0100"
         home_direction: str = "0200"
         limit_switch: str = "0100"
-        velocity: str = self.dth(int(7329109 * speed_deg_s), 4)
-        offset_distance: str = self.dth(self.angle_to_DU(0), 4)
+        velocity: str = dth(int(7329109 * speed_deg_s), 4)
+        offset_distance: str = dth(self.angle_to_DU(0), 4)
         self.write(
             set_home_params
             + channel
@@ -201,7 +112,7 @@ class K10CR1:
         >>>>>>> a794259d6399ff5a82366c24759e5bf0810320ce
                     Relative rotation angle in degree.
         """
-        rel_position: str = self.dth(self.angle_to_DU(angle_deg), 4)
+        rel_position: str = dth(self.angle_to_DU(angle_deg), 4)
         channel: str = "0100"
         header = "48040600d001"  ## 48, 04, 06, 00, d0, 01
         cmd: str = header + channel + rel_position
@@ -215,7 +126,7 @@ class K10CR1:
         angle_deg : float
             Absolute angle of the stage head in degree.
         """
-        abs_position: str = self.dth(self.angle_to_DU(angle_deg), 4)
+        abs_position: str = dth(self.angle_to_DU(angle_deg), 4)
         channel: str = "0100"
         header: str = "53040600d001"  # 53, 04, 06, 00, d0, 01
         cmd: str = header + channel + abs_position
@@ -223,7 +134,7 @@ class K10CR1:
         # return self.rd(20)
 
     def zerobacklash(self) -> None:
-        backlash_position = self.dth(self.angle_to_DU(0), 4)
+        backlash_position = dth(self.angle_to_DU(0), 4)
         channel: str = "0100"
         header: str = "3A040600d001"  # 3A, 04, 06, 00, d0, 01
         cmd: str = header + channel + backlash_position
@@ -244,8 +155,98 @@ class K10CR1:
     def getpos(self) -> float:
         self.write("110401005001")  ## 11, 04, 01, 00, 50, 01
         bytedata: bytes = self.rd(12)[8:]
-        x = self.DU_to_angle(self.btd(bytedata))
+        x = self.DU_to_angle(btd(bytedata))
         return float("%.3f" % x)
+
+
+def dth(x: int, bytelen: int) -> str:
+    if x >= 0:
+        hstring: str = hex(x)
+        hstring: str = hstring[2:]
+        while len(hstring) < 2 * bytelen:
+            hstring = "0" + hstring
+        count = 0
+        new = list(hstring)
+        while count < bytelen * 2:
+            tmp = new[count]
+            new[count] = new[count + 1]
+            new[count + 1] = tmp
+            count = count + 2
+        hstring = "".join(new)
+        hstring = hstring[::-1]
+        return hstring
+    elif x < 0:
+        y = abs(x)
+        bstring = bin(y)
+        bstring = bstring[2:]
+        while len(bstring) < 2 * bytelen * 4:
+            bstring = "0" + bstring
+        # print(bstring)
+        count = 0
+        new = list(bstring)
+        while count < 2 * bytelen * 4:
+            if new[count] == "1":
+                new[count] = "0"
+            else:
+                new[count] = "1"
+            count = count + 1
+        bstring = "".join(new)
+        # print(bstring)
+        count = 2 * bytelen * 4 - 1
+        add = "1"
+        while count > -1:
+            if new[count] != add:
+                add = "0"
+                new[count] = "1"
+            else:
+                new[count] = "0"
+            count = count - 1
+        bstring = "".join(new)
+        # print(bstring)
+        hstring = hex(int(bstring, 2))
+        hstring = hstring[2:]
+        while len(hstring) < 2 * bytelen:
+            hstring = "0" + hstring
+        count = 0
+        new = list(hstring)
+        while count < bytelen * 2:
+            tmp = new[count]
+            new[count] = new[count + 1]
+            new[count + 1] = tmp
+            count = count + 2
+        hstring = "".join(new)
+        hstring = hstring[::-1]
+        lenhstring = len(hstring)
+        if lenhstring > 2 * bytelen:
+            hstring = hstring[1:]
+        return hstring
+
+
+def btd(x: bytes) -> int:
+    bytelen = len(x)
+    count = 0
+    dvalue = 0
+    while count < bytelen:
+        dvalue = dvalue + x[count] * (math.pow(256, count))
+        count = count + 1
+    bstring = bin(int(dvalue))
+    if len(bstring) < 2 * bytelen * 4 + 2:
+        return int(dvalue)
+    elif len(bstring) > 2 * bytelen * 4 + 2:
+        print("Error:Error in byte conversion")
+    else:
+        bstring = bin(int(dvalue - 1))
+        bstring = bstring[2:]
+        count = 0
+        new = list(bstring)
+        while count < 2 * bytelen * 4:
+            if new[count] == "1":
+                new[count] = "0"
+            else:
+                new[count] = "1"
+            count = count + 1
+        bstring = "".join(new)
+        return (int(bstring, 2)) * (-1)
 
 
 """
