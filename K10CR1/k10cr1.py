@@ -252,6 +252,22 @@ def dth(x: int, bytelen: int) -> str:
         return hstring
 
 
+def bytes_to_digit(x: bytes) -> int:
+    """Return the int from the bytes.   Essentially btd return the same value
+
+    Parameters
+    ----------
+    x : bytes
+        Represents an integer
+
+    Returns
+    -------
+    int
+        integer
+    """
+    return int.from_bytes(x, byteorder="little", signed=True)
+
+
 def btd(x: bytes) -> int:
     bytelen = len(x)
     count = 0
