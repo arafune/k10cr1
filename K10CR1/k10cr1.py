@@ -111,7 +111,7 @@ class K10CR1:
         """
         rel_position: str = dth(self.angle_to_DU(angle_deg), 4)
         channel: str = "0100"
-        header = "48040600d001"  ## 48, 04, 06, 00, d0, 01
+        header = "48040600d001"  # 48, 04, 06, 00, d0, 01
         cmd: str = header + channel + rel_position
         self.write(cmd)
 
@@ -162,14 +162,14 @@ def digit_to_hex(x: int, bytelen: int) -> str:
     Parameters
     ----------
     x : int
-        _description_
+        input integer value
     bytelen : int
-        _description_
+        byte length of the output string.
 
     Returns
     -------
     str
-        _description_
+        string of hexadecimal value with big-endian
     """
     tmp = _tohex(x, bytelen)[2:].zfill(bytelen * 2)
     return str(binascii.hexlify(bytes.fromhex(tmp)[::-1]))[2:-1]
