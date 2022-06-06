@@ -1,3 +1,4 @@
+import binascii
 import math
 
 import serial
@@ -105,11 +106,7 @@ class K10CR1:
 
                 Parameters
                 -----------
-        <<<<<<< HEAD
-                anlge_deg: float
-        =======
                 angle_deg: float
-        >>>>>>> a794259d6399ff5a82366c24759e5bf0810320ce
                     Relative rotation angle in degree.
         """
         rel_position: str = dth(self.angle_to_DU(angle_deg), 4)
@@ -157,6 +154,11 @@ class K10CR1:
         bytedata: bytes = self.rd(12)[8:]
         x = self.DU_to_angle(btd(bytedata))
         return float("%.3f" % x)
+
+def digit_to_hex(x: int, bytelen: int) -> str:
+    tmp = _tohex(x, bytelen)[2:].zfill(bytelen*2)
+    return str(binascii.hexlify(bytes.fromhex(tmp)[::-1]))[2:-1]
+
 
 
 def dth(x: int, bytelen: int) -> str:
@@ -221,13 +223,12 @@ def dth(x: int, bytelen: int) -> str:
             hstring = hstring[1:]
         return hstring
 
-
 def btd(x: bytes) -> int:
     bytelen = len(x)
     count = 0
     dvalue = 0
     while count < bytelen:
-        dvalue = dvalue + x[count] * (math.pow(256, count))
+        dvalue = dvalue + x[count] * (math.pow(2**8, count))
         count = count + 1
     bstring = bin(int(dvalue))
     if len(bstring) < 2 * bytelen * 4 + 2:
@@ -248,6 +249,9 @@ def btd(x: bytes) -> int:
         bstring = "".join(new)
         return (int(bstring, 2)) * (-1)
 
+
+def _tohex(val: int, bytelength: int) -> str:
+        return hex((val + (1 << bytelength * 8)) % (1 << bytelength * 8))
 
 """
 The source and destination fields require some further explanation.
