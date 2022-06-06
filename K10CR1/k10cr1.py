@@ -101,13 +101,13 @@ class K10CR1:
     def moverel(self, angle_deg: float) -> None:
         """Start a relative move.
 
-                In this method, the longer version (6 byte header plus 6 data bytes) is used.
-                Thus, the third and 4th bytes is "06 00"
+        In this method, the longer version (6 byte header plus 6 data bytes) is used.
+        Thus, the third and 4th bytes is "06 00"
 
-                Parameters
-                -----------
-                angle_deg: float
-                    Relative rotation angle in degree.
+        Parameters
+        -----------
+        angle_deg: float
+            Relative rotation angle in degree.
         """
         rel_position: str = dth(self.angle_to_DU(angle_deg), 4)
         channel: str = "0100"
@@ -155,13 +155,41 @@ class K10CR1:
         x = self.DU_to_angle(btd(bytedata))
         return float("%.3f" % x)
 
+
 def digit_to_hex(x: int, bytelen: int) -> str:
-    tmp = _tohex(x, bytelen)[2:].zfill(bytelen*2)
+    """Generate hex string from integer (same function with dth)
+
+    Parameters
+    ----------
+    x : int
+        _description_
+    bytelen : int
+        _description_
+
+    Returns
+    -------
+    str
+        _description_
+    """
+    tmp = _tohex(x, bytelen)[2:].zfill(bytelen * 2)
     return str(binascii.hexlify(bytes.fromhex(tmp)[::-1]))[2:-1]
 
 
-
 def dth(x: int, bytelen: int) -> str:
+    """Generate hex string from integer
+
+    Parameters
+    ----------
+    x : int
+        _description_
+    bytelen : int
+        _description_
+
+    Returns
+    -------
+    str
+        _description_
+    """
     if x >= 0:
         hstring: str = hex(x)
         hstring: str = hstring[2:]
@@ -223,6 +251,7 @@ def dth(x: int, bytelen: int) -> str:
             hstring = hstring[1:]
         return hstring
 
+
 def btd(x: bytes) -> int:
     bytelen = len(x)
     count = 0
@@ -251,7 +280,8 @@ def btd(x: bytes) -> int:
 
 
 def _tohex(val: int, bytelength: int) -> str:
-        return hex((val + (1 << bytelength * 8)) % (1 << bytelength * 8))
+    return hex((val + (1 << bytelength * 8)) % (1 << bytelength * 8))
+
 
 """
 The source and destination fields require some further explanation.
