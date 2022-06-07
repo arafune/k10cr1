@@ -9,14 +9,14 @@ class K10CR1:
     """Thorlabs K10CR1 rotation stage class."""
 
     def __init__(self, serial_num: str) -> None:
-        """Set up and connect to device with serial number: ser_num
+        """Set up and connect to device with serial number: serial_num
 
         Parameters
         ----------
-        ser_num : str
+        serial_num : str
             serial number of the K10CR1
         """
-        self.ser_num = serial_num
+        self.serial_num = serial_num
         self.ready = False
         self.connect()
         if not self.ready:
@@ -37,7 +37,7 @@ class K10CR1:
         for port in ports:
             print(port)
             try:
-                if port.serial_number.startswith(self.ser_num):
+                if port.serial_number.startswith(self.serial_num):
                     self.ser = serial.Serial(
                         baudrate=115200, timeout=0.1, port=port.device
                     )
