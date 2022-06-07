@@ -6,12 +6,12 @@ from random import randint
 
 from K10CR1.k10cr1 import dth
 from K10CR1.k10cr1 import btd
-from K10CR1.k10cr1 import digit_to_hex
-
+from K10CR1.k10cr1 import decimal_to_hex
+from K10CR1.k10cr1 import bytes_to_decimal
 
 class Test_equality_dth_digit_to_hex:
     def test_bit1(self) -> None:
-        for i in range(-(2 ** (8 * 1)) / 2, 2 ** (8 * 1) / 2 - 1):
+        for i in range(int(-(2 ** (8 * 1)) / 2), int(2 ** (8 * 1) / 2) - 1):
             print(i)
             assert dth(i, 1) == decimal_to_hex(i, 1)
 
@@ -64,4 +64,7 @@ class Test_btd:
         assert btd(bytes.fromhex("ed")) == -19
         assert btd(bytes.fromhex("f0")) == -16
         assert btd(bytes.fromhex("f1")) == -15
-        # assert btd(bytes.fromhex("80")) == -128  ## Error !!
+        # assert btd(bytes.fromhex("80")) == -128  ## Error !
+    def test_bytes_to_decimal(self):
+        for i in ["acfdffff", "0c77feff", "ff", "fc", "ef", "ee", "ed", "f0" "f1"]:
+            assert btd(bytes.fromhex(i)) == bytes_to_decimal(bytes.fromhex(i))
