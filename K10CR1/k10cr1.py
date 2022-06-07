@@ -8,7 +8,7 @@ from serial.tools import list_ports
 class K10CR1:
     """Thorlabs K10CR1 rotation stage class."""
 
-    def __init__(self, ser_num: str) -> None:
+    def __init__(self, serial_num: str) -> None:
         """Set up and connect to device with serial number: ser_num
 
         Parameters
@@ -16,13 +16,17 @@ class K10CR1:
         ser_num : str
             serial number of the K10CR1
         """
-        self.ser_num = ser_num
+        self.ser_num = serial_num
         self.ready = False
         self.connect()
         if not self.ready:
-            print("Unable to connect to device with serial number: {}".format(ser_num))
+            print(
+                "Unable to connect to device with serial number: {}".format(serial_num)
+            )
         else:
-            print("Connect successful to device with serial number: {}".format(ser_num))
+            print(
+                "Connect successful to device with serial number: {}".format(serial_num)
+            )
             self.zerobacklash()
 
     def connect(self) -> None:
@@ -86,7 +90,7 @@ class K10CR1:
         )
         return None
 
-    def home(self) -> None:
+    def home(self) -> bytes:
         """Start a home move
 
         MGMSG_MOT_MOVE_HOME
@@ -95,7 +99,7 @@ class K10CR1:
         43, 04, "Channel ident", 0x, d, s
         """
         self.set_home_speed(10)
-        self.write("430401005001")  ## 43, 04, 01, 00, 50, 01
+        self.write("430401005001")  # 43, 04, 01, 00, 50, 01
         return self.rd(6)
 
     def moverel(self, angle_deg: float) -> None:
@@ -157,7 +161,7 @@ class K10CR1:
 
 
 def decimal_to_hex(x: int, byte_length: int) -> str:
-    """Genearate hex string from integer
+    """Generate hex string from integer
 
     After python3.2 to_byte method has been prepared.
 
@@ -191,6 +195,12 @@ def bytes_to_decimal(x: bytes) -> int:
         integer
     """
     return int.from_bytes(x, byteorder="little", signed=True)
+
+
+# Below two functions are written in original version.
+# Unfortunately, they are not so accurate and hard to read.
+# Use decimal_to_hex instead of dth
+# Use bytes_to_decimal instead of btd
 
 
 def dth(x: int, bytelen: int) -> str:
